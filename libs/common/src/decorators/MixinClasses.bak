@@ -1,0 +1,66 @@
+import { Controller, Type } from '@nestjs/common';
+import { ClassDecoratorFactory, IClassDecoratorFactory } from '.';
+import { BlogService } from 'apps/blog/src/blog.service';
+import { BlogController } from 'apps/blog/src/blog.controller';
+import { BlogRepository } from 'apps/blog/src/blog.repo';
+
+const MixinClass: ClassDecoratorFactory<Type<any>[]> = (toMixin) => (TGT) => {
+  applyMixins(TGT, toMixin);
+  return TGT;
+};
+function applyMixins(TGT: Type<any>, clz: Type<any>[]) {
+  clz.forEach((baseCtor) => {
+    Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
+      Object.defineProperty(
+        TGT.prototype,
+        name,
+        Object.getOwnPropertyDescriptor(baseCtor.prototype, name) ||
+          Object.create(null),
+      );
+    });
+  });
+}
+
+function classDecorator(constructor) {
+  return class extends constructor {
+    newProperty = 'new property';
+    hello = 'override';
+  };
+}
+export const ProvideProperty = (key, val) => (TGT) => {
+  class NeoTGT extends TGT {
+    constructor(...args) {
+      super(...args);
+      this[key] = val;
+    }
+  }
+
+  return NeoTGT as Type<any>;
+};
+
+@ProvideProperty('ccc', 333)
+class Greeter {
+  constructor(public m: string) {}
+}
+// console.log(new Greeter('world').m);
+// console.log(new Greeter('world').ccc);
+// class S {
+//   sa: number = 1;
+//   Sgreet() {
+//     return 'greeting from S';
+//   }
+// }
+
+// class S2 {
+//   sa2: number = 2;
+//   Sgreet2() {
+//     return 'greeting from S' + this.constructor.name;
+//   }
+// }
+
+// class A {}
+// applyMixins(A, [S, S2]);
+// console.log(new S2().sa2);
+const SS = {
+  foo() {},
+};
