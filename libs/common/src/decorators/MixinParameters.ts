@@ -1,6 +1,5 @@
 import { IMethodDecoratorFactory } from '.';
 import { PageDto } from '../pagination/page.dto';
-import { XReflect } from '../xreflect';
 
 export const MixinParameters: IMethodDecoratorFactory =
   (newParameters: any[], composition?: 'shift' | 'push') =>

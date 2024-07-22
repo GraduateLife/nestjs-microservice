@@ -3,7 +3,7 @@ import { BlogController } from './blog.controller';
 import { BlogService } from './blog.service';
 import { BlogRepository } from './blog.repo';
 import { DatabaseModule } from '@app/database';
-import { BlogEntity } from './entities/blog.entity';
+import { BlogEntity } from './objects/blog.entity';
 
 describe('BlogController', () => {
   let appController: BlogController;

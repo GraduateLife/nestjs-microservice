@@ -22,3 +22,37 @@ export const ObjectStringify = (obj: object, delimiters?: Partial<D>) => {
     .map(([k, v]) => `${k}${betweenKvs}${v}`)
     .join(betweenRows);
 };
+
+export const ObjectPickProperties = (
+  obj: Record<string, any>,
+  keys: string[],
+): Record<string, any> => {
+  const res = {};
+  for (const key of keys) {
+    if (!obj[key])
+      throw new Error(`property ${key} does not exist on original object`);
+    res[key] = obj[key];
+  }
+  return res;
+};
+
+export const ObjectPropertyAddPrefix = (
+  obj: Record<string, any>,
+  prefix: string,
+): Record<string, any> => {
+  const res = {};
+  for (const key of Object.keys(obj)) {
+    res[prefix + key] = obj[key];
+  }
+  return res;
+};
+
+export const ObjectPropertyUnset = (
+  obj: Record<string, any>,
+  keys: string[],
+): Record<string, any> => {
+  for (const key of keys) {
+    if (obj[key]) delete obj[key];
+  }
+  return { ...obj };
+};

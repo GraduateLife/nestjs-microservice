@@ -25,3 +25,7 @@ export const ArrayIsSubset = <T>(
   }
   return referTo.some((ai) => target.includes(ai));
 };
+
+export const ArrayWildCard = (pattern: RegExp, arr: string[]) => {
+  return arr.filter((item) => pattern.test(item));
+};

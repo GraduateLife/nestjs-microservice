@@ -1,4 +1,3 @@
-import { IClassDecoratorFactory } from '@app/common/decorators';
 import { ArrayIsSubset } from '@app/common/types/Array';
 import { XReflect } from '@app/common/xreflect';
 import { SetMetadata, Type } from '@nestjs/common';
@@ -40,12 +39,10 @@ export const isValidRestfulDto = (TGT: Type<any>) => {
     console.log('wrong location');
     return false;
   }
-  const { validationGroups } = useTemplate(mda.toUseTemplate);
-  if (
-    !ArrayIsSubset(mda.toBeValidatedInGroups, [...validationGroups], 'strict')
-  ) {
-    console.log('got ', mda.toBeValidatedInGroups);
-    console.log('want ', validationGroups);
+  const { Methods } = useTemplate(mda.toUseTemplate);
+  if (!ArrayIsSubset(mda.toBeValidatedInGroups, [...Methods], 'strict')) {
+    console.log(`in dto ${TGT} got groups `, mda.toBeValidatedInGroups);
+    console.log(`but in template ${mda.toUseTemplate} want `, Methods);
     console.log('wrong groups');
     return false;
   }

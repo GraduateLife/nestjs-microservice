@@ -2,6 +2,7 @@ import { isObject } from 'class-validator';
 import { Exception } from '../exceptions';
 import { isPageMetadata, isPage } from '../pagination/types';
 import { isNil } from './Object';
+import { isLiteral } from './Primitives';
 
 export const DataType = (val: any) => {
   if (isNil(val)) return '$$NIL';
@@ -15,5 +16,7 @@ export const DataType = (val: any) => {
     if (isPage(val)) return '$$PAGE';
     return '$$OBJECT';
   }
+
+  if (isLiteral(val)) return '$$LITERAL';
   throw new Exception('unknown data type');
 };

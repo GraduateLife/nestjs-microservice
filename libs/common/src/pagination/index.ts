@@ -57,6 +57,7 @@ export const createPageMetadata = (
   // if (toHaveItems === 0) {
   //   throw new Exception(`Cannot create page metadata for nothing`);
   // }
+
   const [resInt, resRem] = Divide(toHaveItems, pageSize);
 
   let toHavePage: number;
@@ -67,6 +68,11 @@ export const createPageMetadata = (
   } else if (resInt > 0 && resRem === 0) {
     toHavePage = resInt;
     lastPageItem = pageSize;
+  } else if (resInt === 0 && resRem === 0) {
+    toHavePage = 0;
+  }
+  if (toHavePage === undefined) {
+    throw 'toHavePage isnot defined!';
   }
 
   if (currentPage > toHavePage) {

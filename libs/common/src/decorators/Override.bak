@@ -1,0 +1,10 @@
+import { MethodDecoratorFactory } from '.';
+import { XReflect } from '../xreflect';
+
+export const Override: MethodDecoratorFactory<MethodDecorator> =
+  (decorator) => (TGT, Key, desc) => {
+    XReflect.setMethodMetadata(TGT, Key, 'OVERRIDE_DECORATOR_KEY', {
+      methodName: Key,
+      toApplyDecorator: decorator,
+    });
+  };

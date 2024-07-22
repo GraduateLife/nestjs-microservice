@@ -1,32 +1,57 @@
 import { BlogService } from './blog.service';
 import { useTemplate } from '@app/restful';
-import { BlogView, CreateBlogDto, UpdateBlogDto } from './dto/blog.dto';
-import { Body, Param, Query } from '@nestjs/common';
+import { CreateBlogDto, UpdateBlogDto } from './objects/blog.dto';
+import { Body, Get, Param, Query, UseInterceptors } from '@nestjs/common';
 import { PageDto } from '@app/common/pagination/page.dto';
+import { IDefaultTemplate } from '@app/restful/templates/Default';
+import { BlogView } from './objects/blog.view';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { useMongoose } from '@app/database/useMongoose';
 
 const { RestfulController, ParamMagics } = useTemplate('default');
+const { MongooseSerializer, ValidateObjectIdPipe } = useMongoose();
 
-@RestfulController('/blog', BlogView)
-export class BlogController {
+@UseInterceptors(MongooseSerializer)
+@RestfulController('blog', BlogView, {
+  findMany: [
+    // SkipViewSerialization(),
+    ApiOkResponse({ description: 'This method returns blogs in page' }),
+  ],
+})
+export class BlogController implements IDefaultTemplate {
   constructor(private blogService: BlogService) {}
 
-  async create(@Body() CREATE_DTO: CreateBlogDto) {
-    return await this.blogService.create(CREATE_DTO);
+  createOne(@Body() createBlogDto: CreateBlogDto) {
+    return this.blogService.create(createBlogDto);
+  }
+  @Get('/deleted')
+  findDeleted(@Query() pageDto: PageDto) {
+    return this.blogService.findManyDeletedByAttributesInPage(
+      pageDto,
+      // isDeleted: true,
+    );
+  }
+  @Get('/not-deleted')
+  findNotDeleted(@Query() pageDto: PageDto) {
+    return this.blogService.findManyNotDeletedByAttributesInPage(pageDto);
   }
 
-  findAll(@Query() LIST_DTO: PageDto) {
-    return this.blogService.findManyInPage(LIST_DTO);
+  findMany(@Query() pageDto: PageDto) {
+    return this.blogService.findManyInPage(pageDto);
   }
 
-  findOne(@Param(ParamMagics.id) id: any) {
+  findOne(@Param(ParamMagics.id, ValidateObjectIdPipe) id: string) {
     return this.blogService.findOne(id);
   }
 
-  update(@Param(ParamMagics.id) id: any, @Body() UPDATE_DTO: UpdateBlogDto) {
-    return this.blogService.update(id, UPDATE_DTO);
+  updateOne(
+    @Param(ParamMagics.id, ValidateObjectIdPipe) id: string,
+    @Body() updateBlogDto: UpdateBlogDto,
+  ) {
+    return this.blogService.update(id, updateBlogDto);
   }
 
-  remove(@Param(ParamMagics.id) id: string) {
+  deleteOne(@Param(ParamMagics.id, ValidateObjectIdPipe) id: string) {
     return this.blogService.remove(id);
   }
 }

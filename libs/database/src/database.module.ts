@@ -1,30 +1,20 @@
-import { Module, Type } from '@nestjs/common';
-import { MongooseModule, SchemaFactory } from '@nestjs/mongoose';
+import { Module } from '@nestjs/common';
 
-const url = `mongodb://localhost:27017/`.replace('<password>', 'zyt753951');
+import { useMongooseModule } from './useMongoose/useMongoose.module';
 
-// const createEntityCtx = <G>(TGT: Type<G>) => {
-//   return SchemaFactory.createForClass<G>(TGT);
-// };
+type DatabaseNames = 'mongoose';
 
-// DatabaseModule.forFeature([{ name: BlogEntity.name, schema: BlogSchema }]),
-
-@Module({
-  imports: [MongooseModule.forRoot(url)],
-  // providers: [DatabaseService],
-  // exports: [MongooseModule],
-})
+@Module({})
 export class DatabaseModule {
-  static forFeature<G>(toRegister: Type<G> | Type<G>[]) {
-    if (!Array.isArray(toRegister)) {
-      toRegister = [toRegister];
+  static use(subModuleName: DatabaseNames) {
+    switch (subModuleName) {
+      case 'mongoose':
+        return useMongooseModule;
+
+        break;
+
+      default:
+        break;
     }
-    const transformed = toRegister.map((entity: Type<G>) => {
-      return {
-        name: entity.name,
-        schema: SchemaFactory.createForClass(entity),
-      };
-    });
-    return MongooseModule.forFeature([...transformed]);
   }
 }

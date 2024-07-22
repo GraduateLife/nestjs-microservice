@@ -4,10 +4,10 @@ import {
   ClassSerializerInterceptor,
   Type,
   PlainLiteralObject,
+  ClassSerializerContextOptions,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ClassTransformOptions, plainToInstance } from 'class-transformer';
-import mongoose from 'mongoose';
 
 export class RestfulSerializer extends ClassSerializerInterceptor {
   constructor(private outputClass: Type<any>) {
@@ -17,51 +17,41 @@ export class RestfulSerializer extends ClassSerializerInterceptor {
     response: any,
     options: ClassTransformOptions,
   ): PlainLiteralObject | PlainLiteralObject[] {
+    console.log('going to RestfulSerializer');
     if (options.groups) {
+      console.log('in restful part, resp is ', response);
+      console.log('options is', options);
       const res = plainToInstance(this.outputClass, response, {
         excludeExtraneousValues: true,
         ...options,
       });
 
+      if (DataType(response) === '$$PAGE') {
+        const mapped = response.page_data.map((item) =>
+          plainToInstance(this.outputClass, item, {
+            excludeExtraneousValues: true,
+            ...options,
+          }),
+        );
+        return {
+          page_data: mapped,
+          page_meta: response.page_meta,
+        };
+      }
+
+      // if (response._id) {
+      //   console.log(response._id);
+      //   res._id = response._id.toString();
+      // }
+      console.log('output', res);
+
       return res;
     }
-
-    const res = super.transformToPlain(this.prepare(response), options);
+    console.log('no group');
+    console.log(response);
+    const res = super.transformToPlain(response, options);
 
     return res;
     // return instanceToPlain(response, { strategy: 'excludeAll', ...options });
   }
-  private prepare(response: any) {
-    if (DataType(response) === '$$OBJECT') {
-      const r: object = response;
-      if (isMongoDbResObject(r)) {
-        return MongodbResStringify(r);
-      }
-    }
-    if (DataType(response) === '$$PAGE') {
-      const r: Page = response;
-      const stringified = r.page_data.map((pageItem) =>
-        MongodbResStringify(pageItem),
-      );
-
-      const togo: Page = {
-        page_data: stringified,
-        page_meta: r.page_meta,
-      };
-      return togo;
-    }
-  }
 }
-
-const isMongoDbResObject = (response: PlainLiteralObject) => {
-  return response._id && response._id instanceof mongoose.Types.ObjectId;
-};
-const MongodbResStringify = (response: PlainLiteralObject) => {
-  if (response._doc) {
-    response = response._doc;
-  }
-  return {
-    ...response,
-    _id: response._id.toString(),
-  };
-};

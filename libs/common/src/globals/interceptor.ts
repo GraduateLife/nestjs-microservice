@@ -14,7 +14,7 @@ import { XRequest, XHeaders } from '../xrequest';
 const timeoutMs = 4000;
 
 @Injectable()
-export class CommonInterceptor implements NestInterceptor {
+export class CommonTimeoutInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = XRequest.getReqFromCxt(context);
     const res = XRequest.getResFromCxt(context);
@@ -45,8 +45,3 @@ export class CommonInterceptor implements NestInterceptor {
     );
   }
 }
-
-// new ObjectId('66865013f013d8bcca4270c7');
-// const id = new mongoose.Types.ObjectId('66865013f013d8bcca4270c7');
-// console.log(id instanceof mongoose.Types.ObjectId);
-// console.log(id.toString());

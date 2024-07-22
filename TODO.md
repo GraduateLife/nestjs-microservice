@@ -19,3 +19,22 @@ crud"基本"没有问题,
 
 使用@SerializationOption和@Expose来区别dto, nest自带的序列化器没发现有什么用
 again,接下来继续在dto装饰器里注册group,用plainToInstance的时候给个group就行<=doing
+
+序列化器可以分成两个吗?一个处理mongodb,一个处理restful view
+
+Q:能不能搞一个useDatabase钩子, paramPipe需要解析objectId,说实话我不想让这个在service里报错
+A: 不行,破坏了代码层级
+
+树形?这样的话原来的分页需要改一下了
+
+Q:软删除功能
+A:done
+
+Q:swagger集成和mocker
+A: swagger完成,mocker有点问题
+
+Q:mongodb不需要\_\_v,用redis做锁
+A:done
+
+从控制器方法名字上获取group名字是个好主意吗?,这样就不需要Restful type了,反正也没什么用
+A:done

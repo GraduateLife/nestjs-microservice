@@ -1,7 +1,12 @@
 import { createPageMetadata, Divide } from './pagination';
 import { DataType } from './types';
-import { ArrayGroupBy, ArrayIsSubset } from './types/Array';
-import { ObjectStringify } from './types/Object';
+import { ArrayGroupBy, ArrayIsSubset, ArrayWildCard } from './types/Array';
+import {
+  ObjectPickProperties,
+  ObjectPropertyAddPrefix,
+  ObjectPropertyUnset,
+  ObjectStringify,
+} from './types/Object';
 
 describe('ObjectStringify', () => {
   it('works', () => {
@@ -184,5 +189,55 @@ describe('ArrayIsSubset', () => {
     const short = ['create', 'x'];
     const long = ['create', 'update'];
     expect(ArrayIsSubset(short, long, 'strict')).toBe(false);
+  });
+});
+
+describe('ArrayWildCard', () => {
+  it('works', () => {
+    expect(ArrayWildCard(/Many$/, ['findOne', 'findMany', 'getMany'])).toEqual([
+      'findMany',
+      'getMany',
+    ]);
+  });
+});
+
+describe('ObjectPickProperties', () => {
+  it('works', () => {
+    expect(ObjectPickProperties({ a: 1, b: 2 }, ['a'])).toEqual({ a: 1 });
+  });
+  it('works', () => {
+    expect(() => ObjectPickProperties({ a: 1, b: 2, c: 3 }, ['d'])).toThrow(
+      Error,
+    );
+  });
+  it('works', () => {
+    const s = { a: 1, b: 2, c: [1, 2] };
+    const res = ObjectPickProperties(s, ['a', 'c']);
+    s.c = [56];
+    expect(res).toEqual({
+      a: 1,
+      c: [1, 2],
+    });
+  });
+});
+
+describe('ObjectPropertyAddPrefix', () => {
+  it('works', () => {
+    expect(ObjectPropertyAddPrefix({ a: 1, b: 2 }, 'ok_')).toEqual({
+      ok_a: 1,
+      ok_b: 2,
+    });
+  });
+});
+
+describe('ObjectPropertyUnset', () => {
+  it('works', () => {
+    expect(ObjectPropertyUnset({ a: 1, b: 2 }, ['b'])).toEqual({ a: 1 });
+  });
+  it('works', () => {
+    expect(ObjectPropertyUnset({ a: 1, b: 2 }, ['k'])).toEqual({
+      a: 1,
+      b: 2,
+    });
   });
 });
